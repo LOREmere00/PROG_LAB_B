@@ -25,6 +25,8 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
 public class regCitt extends JPanel {
+
+	JPanel panel;
 	private JTextField textFieldNomeUtente;
 	private JPasswordField passwordField;
 	private JTextField textFieldNome;
@@ -38,7 +40,7 @@ public class regCitt extends JPanel {
 
 		setLayout(new GridLayout(1, 0, 0, 0));
 
-		JPanel panel = new JPanel();
+		panel = new JPanel();
 		add(panel);
 		GridBagLayout gbl_panel = new GridBagLayout();
 		gbl_panel.columnWidths = new int[] { 100, 225, 100, 225, 100, 0 };
@@ -48,22 +50,13 @@ public class regCitt extends JPanel {
 				Double.MIN_VALUE };
 		panel.setLayout(gbl_panel);
 		
-		try {
-			
-			// Inserimento immagine primula
-			BufferedImage prim = ImageIO.read(new File("./src/primula.png"));
-			Image newImage = prim.getScaledInstance(50, 50, Image.SCALE_DEFAULT);
-			JLabel lblPrimula = new JLabel(new ImageIcon(newImage));
-			lblPrimula.setPreferredSize(new Dimension(50, 50));
-			GridBagConstraints gbc_lblPrimula = new GridBagConstraints();
-			gbc_lblPrimula.insets = new Insets(0, 0, 5, 5);
-			gbc_lblPrimula.gridx = 4;
-			gbc_lblPrimula.gridy = 0;
-			panel.add(lblPrimula, gbc_lblPrimula);
-		} catch (Exception e) {
+		inserimentoImmagini();
+		gestioneLayout();
+	}
 
-			e.printStackTrace();
-		}
+	private void gestioneLayout() {
+
+		String[] arrTipoVaccino = { "Astrazeneca", "Pfizer", "Jonson&Jonson", "Moderna" };
 
 		JLabel lbl_credentials = new JLabel("INSERIRE LE CREDENZIALI");
 		lbl_credentials.setForeground(Color.BLUE);
@@ -177,7 +170,7 @@ public class regCitt extends JPanel {
 		gbc_comboBox_nomeCentro.gridy = 5;
 		panel.add(comboBox_nomeCentro, gbc_comboBox_nomeCentro);
 
-		JComboBox comboBox_tipoVaccino = new JComboBox();
+		JComboBox<Object> comboBox_tipoVaccino = new JComboBox<Object>(arrTipoVaccino);
 		GridBagConstraints gbc_comboBox_tipoVaccino = new GridBagConstraints();
 		gbc_comboBox_tipoVaccino.insets = new Insets(0, 0, 5, 5);
 		gbc_comboBox_tipoVaccino.fill = GridBagConstraints.HORIZONTAL;
@@ -426,6 +419,25 @@ public class regCitt extends JPanel {
 		gbc_btn_regCentro.gridy = 13;
 		panel.add(btn_regCentro, gbc_btn_regCentro);
 
+	}
 
+	private void inserimentoImmagini() {
+
+		try {
+
+			// Inserimento immagine primula
+			BufferedImage prim = ImageIO.read(new File("./src/primula.png"));
+			Image newImage = prim.getScaledInstance(50, 50, Image.SCALE_DEFAULT);
+			JLabel lblPrimula = new JLabel(new ImageIcon(newImage));
+			lblPrimula.setPreferredSize(new Dimension(50, 50));
+			GridBagConstraints gbc_lblPrimula = new GridBagConstraints();
+			gbc_lblPrimula.insets = new Insets(0, 0, 5, 5);
+			gbc_lblPrimula.gridx = 4;
+			gbc_lblPrimula.gridy = 0;
+			panel.add(lblPrimula, gbc_lblPrimula);
+		} catch (Exception e) {
+
+			e.printStackTrace();
+		}
 	}
 }
