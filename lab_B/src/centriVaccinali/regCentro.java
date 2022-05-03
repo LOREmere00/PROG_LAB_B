@@ -12,8 +12,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.sql.Connection;
@@ -48,8 +46,8 @@ public class regCentro extends JPanel {
 	String risComboQualificatore;
 	String colonnaQuery, tabQuery;
 	Connection connection;
-	String[] arrRegioni;
-	String[] arrProvince;
+	String[] arrRegioni = new String[20];
+	String[] arrProvince = new String[107];
 
 	/*
 	 * Variabili per connessione al DB
@@ -77,7 +75,7 @@ public class regCentro extends JPanel {
 		gbl_panel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
 				0.0, Double.MIN_VALUE };
 		panel.setLayout(gbl_panel);
-		
+
 		/*
 		 * Estrazione regioni dal DB
 		 */
@@ -87,7 +85,7 @@ public class regCentro extends JPanel {
 			 * Connessione al DB
 			 */
 			connection = DriverManager.getConnection(jdbcURL, username, password);
-			System.out.println("connessione al server DB per richiesta avvenuta con successo.");
+			System.out.println("connessione al server DB avvenuta con successo.");
 			/*
 			 * Creazione della query per le regioni
 			 */
@@ -95,26 +93,34 @@ public class regCentro extends JPanel {
 			Statement statement = connection.createStatement();
 			ResultSet resSet = statement.executeQuery(sql);
 			int i = 0;
-			arrRegioni = new String[20];
 			while (resSet.next()) {
 
 				arrRegioni[i] = resSet.getString(1);
 				i++;
 			}
+
+			/*
+			 * Creazione della query per le province
+			 */
+			sql = "SELECT sigla_provincia, provincia FROM regioni_province ORDER BY provincia ASC";
+			statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+			resSet = statement.executeQuery(sql);
+			i = 0;
+			while (resSet.next()) {
+
+				arrProvince[i] = (resSet.getString(1) + ": " + resSet.getString(2));
+				i++;
+			}
+			/*
+			 * Chiusura connessione
+			 */
 			connection.close();
 		} catch (SQLException e) {
 
 			System.out.println("connessione al DB in richiesta fallita.");
 			e.printStackTrace();
 		}
-
-		RichiestaDB(colonnaQuery, tabQuery);
-
 		GestioneLayout();
-	}
-
-	private void RichiestaDB(String colonnaQuery, String tabQuery) {
-
 	}
 
 	private void InserimentoDB(String colNomeCentro, int colQualificatore, String colNomeVia, int colNumeroCivico,
@@ -161,12 +167,14 @@ public class regCentro extends JPanel {
 	private void GestioneLayout() {
 
 		String[] arrTipoVia = { "via", "viale", "piazzale" };
-		String[] arrTipologiaVacc = { "ospedaliero", "hub", "aziendale" };
+		String[] arrTipologiaCentro = { "ospedaliero", "hub", "aziendale" };
 		String[] arrTipoVaccino = { "Astrazeneca", "Pfizer", "Jonson&Jonson", "Moderna" };
 
 		try {
 
-			// Inserimento immagine primula
+			/*
+			 * Inserimento immagine primula
+			 */
 			BufferedImage prim = ImageIO.read(new File("./src/primula.png"));
 			Image newPrim = prim.getScaledInstance(50, 50, Image.SCALE_DEFAULT);
 			JLabel lblPrim = new JLabel(new ImageIcon(newPrim));
@@ -178,7 +186,9 @@ public class regCentro extends JPanel {
 			gbc_lblPrim.gridy = 0;
 			panel.add(lblPrim, gbc_lblPrim);
 
-			// Inserimento immagine/pulsante "goBack"
+			/*
+			 * Inserimento immagine/pulsante "goBack"
+			 */
 			BufferedImage back = ImageIO.read(new File("./src/gobackb.png"));
 			Image newBack = back.getScaledInstance(50, 50, Image.SCALE_DEFAULT);
 			JButton butt = new JButton(new ImageIcon(newBack));
@@ -313,46 +323,38 @@ public class regCentro extends JPanel {
 		panel.add(lblNewLabel_2, gbc_lblNewLabel_2);
 
 		JComboBox<Object> regione = new JComboBox<Object>(arrRegioni);
-		String selProvincia = (String) regione.getSelectedItem();
-		regione.addItemListener(new ItemListener() {
-
-			public void itemStateChanged(ItemEvent e) {
-				
-				if(e.getID() == ItemEvent.ITEM_STATE_CHANGED) {
-					
-					if(e.getStateChange() == ItemEvent.SELECTED) {
-						
-						try {
-
-					/*
-					 * Connessione al DB
-					 */
-					connection = DriverManager.getConnection(jdbcURL, username, password);
-					System.out.println("connessione al server DB per richiesta avvenuta con successo.");
-					/*
-					 * Crezione della query per le regioni
-					 */
-					String sql = "SELECT DISTINCT sigla_provincia FROM regioni_province WHERE nome_regione = '"
-							+ selProvincia + "' ORDER BY sigla_provincia ASC";
-					Statement statement = connection.createStatement();
-					ResultSet resSet = statement.executeQuery(sql);
-					int i = 0;
-					arrProvince = new String[20];
-					while (resSet.next()) {
-
-						arrProvince[i] = resSet.getString(1);
-						i++;
-					}
-					connection.close();
-				} catch (SQLException er) {
-
-					er.printStackTrace();
-				}
-			}
-				}
-			}
-			});
-		
+		regione.setSelectedIndex(0);
+		/*
+		 * regione.addItemListener(new ItemListener() {
+		 * 
+		 * public void itemStateChanged(ItemEvent e) {
+		 * 
+		 * if(e.getID() == ItemEvent.ITEM_STATE_CHANGED) {
+		 * 
+		 * if(e.getStateChange() == ItemEvent.SELECTED) {
+		 * 
+		 * try {
+		 * 
+		 * /* Connessione al DB
+		 *
+		 * connection = DriverManager.getConnection(jdbcURL, username, password);
+		 * System.out.
+		 * println("connessione al server DB per richiesta avvenuta con successo.");
+		 * 
+		 * /* Crezione della query per le regioni
+		 *
+		 * String selProvincia = (String) regione.getSelectedItem(); String sql =
+		 * "SELECT DISTINCT sigla_provincia FROM regioni_province WHERE nome_regione = '"
+		 * + selProvincia + "' ORDER BY sigla_provincia ASC"; Statement statement =
+		 * connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,
+		 * ResultSet.CONCUR_READ_ONLY); ResultSet resSet = statement.executeQuery(sql);
+		 * while (resSet.next()) {
+		 * 
+		 * System.out.println("ciao: " + resSet.getString(1)); } connection.close(); }
+		 * catch (SQLException er) {
+		 * 
+		 * er.printStackTrace(); } } } } });
+		 */
 		GridBagConstraints gbc_regione = new GridBagConstraints();
 		gbc_regione.gridwidth = 2;
 		gbc_regione.insets = new Insets(0, 0, 5, 5);
@@ -361,7 +363,7 @@ public class regCentro extends JPanel {
 		gbc_regione.gridy = 6;
 		panel.add(regione, gbc_regione);
 
-		JComboBox<Object> provincia = new JComboBox<Object>(arrProvince);
+		JComboBox provincia = new JComboBox(arrProvince);
 		GridBagConstraints gbc_proincia = new GridBagConstraints();
 		gbc_proincia.insets = new Insets(0, 0, 5, 5);
 		gbc_proincia.fill = GridBagConstraints.BOTH;
@@ -548,7 +550,7 @@ public class regCentro extends JPanel {
 		gbc_nomeCentro.gridy = 12;
 		panel.add(nomeCentro, gbc_nomeCentro);
 
-		JComboBox<Object> selCentro = new JComboBox<Object>(arrTipologiaVacc);
+		JComboBox<Object> selCentro = new JComboBox<Object>(arrTipologiaCentro);
 		GridBagConstraints gbc_selCentro = new GridBagConstraints();
 		gbc_selCentro.insets = new Insets(0, 0, 5, 5);
 		gbc_selCentro.fill = GridBagConstraints.BOTH;
