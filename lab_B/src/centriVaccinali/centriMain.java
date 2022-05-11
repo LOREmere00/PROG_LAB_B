@@ -23,7 +23,7 @@ public class centriMain extends JFrame {
 					 * Impostazioni del frame
 					 */
 					JFrame frame = new JFrame();
-					regCitt panel = new regCitt();
+					registraVaccinato panel = new registraVaccinato();
 					frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 					frame.setLocation(600, 50);
 					panel.setPreferredSize(new Dimension(750, 550));

@@ -66,7 +66,7 @@ public class confermaReg extends JPanel {
 
 			public void actionPerformed(ActionEvent e) {
 
-				regCitt pan = new regCitt();
+				registraVaccinato pan = new registraVaccinato();
 				removeAll();
 				add(pan);
 				repaint();
